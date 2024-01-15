@@ -121,7 +121,7 @@ theorem Nat.two_mul (n : ℕ) :
     | ofNat n =>
       { simp [Int.neg]
         cases n
-        { simp }
+        { congr }
         { simp [Int.negOfNat] } }
     | negSucc n =>
       { simp [Int.neg]
@@ -467,7 +467,8 @@ example (s : State) :
 
 example (s : State) :
   s["a" ↦ 0]["b" ↦ 2] = s["b" ↦ 2]["a" ↦ 0] :=
-  by simp
+  by simp (config := {decide := true})
+  -- see Release Notes for Lean v4.3.0
 
 example (s : State) :
   s["a" ↦ s "a"]["b" ↦ 0] = s["b" ↦ 0] :=
