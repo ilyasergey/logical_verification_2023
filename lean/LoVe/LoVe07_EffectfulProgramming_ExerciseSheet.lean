@@ -2,6 +2,8 @@
 Johannes Hölzl, and Jannis Limperg. See `LICENSE.txt`. -/
 
 import LoVe.LoVe07_EffectfulProgramming_Demo
+import Ssreflect.Lang
+
 
 
 /- # LoVe Exercise 7: Effectful Programming
@@ -51,24 +53,11 @@ def Option.orelse {α : Type} : Option α → Option α → Option α
   { Option.LawfulMonad with
     emp          := Option.none
     orelse       := Option.orelse
-    emp_orelse   :=
-      sorry
-    orelse_emp   :=
-      by
-        intro α ma
-        simp [Option.orelse]
-        cases ma
-        { rfl }
-        { rfl }
-    orelse_assoc :=
-      sorry
-    emp_bind     :=
-      by
-        intro α β f
-        simp [Bind.bind]
-        rfl
-    bind_emp     :=
-      sorry
+    emp_orelse   := by move=>? ma//=
+    orelse_emp   := by move=>? [|a]//=
+    orelse_assoc := by move=> T [|a] [|b] [|c]//=
+    emp_bind     := by move=>α β f/=; rfl
+    bind_emp     := by move=>T S [|a]/= <;> srw Bind.bind //
   }
 
 @[simp] theorem Option.some_bind {α β : Type} (a : α) (g : α → Option β) :
