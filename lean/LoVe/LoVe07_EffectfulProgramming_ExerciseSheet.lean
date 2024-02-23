@@ -5,6 +5,9 @@ import LoVe.LoVe07_EffectfulProgramming_Demo
 import Ssreflect.Lang
 
 
+example {α : Type} : α → α := by
+  move=> x; trivial
+
 
 /- # LoVe Exercise 7: Effectful Programming
 
@@ -15,6 +18,8 @@ set_option autoImplicit false
 set_option tactic.hygienic false
 
 namespace LoVe
+
+
 
 
 /- ## Question 1: A State Monad with Failure
@@ -61,8 +66,8 @@ def Option.orelse {α : Type} : Option α → Option α → Option α
   }
 
 @[simp] theorem Option.some_bind {α β : Type} (a : α) (g : α → Option β) :
-  (Option.some a >>= g) = g a :=
-  sorry
+  (Option.some a >>= g) = g a := by rfl
+
 
 /- 1.2. Now we are ready to define `FAction σ`: a monad with an internal state
 of type `σ` that can fail (unlike `Action σ`).
@@ -80,17 +85,16 @@ Hints:
 * `FAction` is very similar to `Action` from the lecture's demo. You can look
   there for inspiration. -/
 
-def FAction (σ : Type) (α : Type) : Type :=
-  sorry
+def FAction (σ : Type) (α : Type) : Type := σ → Option (α × σ)
 
 /- 1.3. Define the `get` and `set` function for `FAction`, where `get` returns
 the state passed along the state monad and `set s` changes the state to `s`. -/
 
 def get {σ : Type} : FAction σ σ :=
-  sorry
+  fun σ => some (σ, σ)
 
 def set {σ : Type} (s : σ) : FAction σ Unit :=
-  sorry
+  fun _ => some ((), s)
 
 /- We set up the `>>=` syntax on `FAction`: -/
 
@@ -109,8 +113,7 @@ theorem FAction.bind_apply {σ α β : Type} (f : FAction σ α)
 /- 1.4. Define the operator `pure` for `FAction`, in such a way that it will
 satisfy the three laws. -/
 
-def FAction.pure {σ α : Type} (a : α) : FAction σ α :=
-  sorry
+def FAction.pure {σ α : Type} (a : α) : FAction σ α := fun σ => (a, σ)
 
 /- We set up the syntax for `pure` on `FAction`: -/
 
@@ -118,8 +121,7 @@ instance FAction.Pure {σ : Type} : Pure (FAction σ) :=
   { pure := FAction.pure }
 
 theorem FAction.pure_apply {σ α : Type} (a : α) (s : σ) :
-  (pure a : FAction σ α) s = Option.some (a, s) :=
-  by rfl
+  (pure a : FAction σ α) s = Option.some (a, s) := by rfl
 
 /- 1.5. Register `FAction` as a monad.
 
@@ -132,20 +134,22 @@ Hints:
 
 @[instance] def FAction.LawfulMonad {σ : Type} : LawfulMonad (FAction σ) :=
   { FAction.Bind, FAction.Pure with
-    pure_bind :=
-      by
-      sorry
+    pure_bind := by move=>?? a f //
     bind_pure :=
       by
+        -- This proof was give
         intro α ma
         apply funext
         intro s
         simp [FAction.bind_apply, FAction.pure_apply]
         apply LawfulMonad.bind_pure
-    bind_assoc :=
-      sorry
+    bind_assoc := by
+      move=>??? f g ma
+      -- If you just type "apply" below, Lean panics
+      apply funext=>x
+      simp [FAction.bind_apply]
+      -- Vova: can I do it better?
   }
-
 
 /- ## Question 2 (**optional**): Kleisli Operator
 
@@ -162,21 +166,27 @@ infixr:90 (priority := high) " >=> " => kleisli
 /- 2.1 (**optional**). Prove that `pure` is a left and right unit for the
 Kleisli operator. -/
 
+
+
 theorem pure_kleisli {m : Type → Type} [LawfulMonad m] {α β : Type}
     (f : α → m β) :
-  (pure >=> f) = f :=
-  sorry
+  (pure >=> f) = f := by
+  apply funext=>x; srw kleisli
+  apply LawfulMonad.pure_bind
+
 
 theorem kleisli_pure {m : Type → Type} [LawfulMonad m] {α β : Type}
     (f : α → m β) :
-  (f >=> pure) = f :=
-  sorry
+  (f >=> pure) = f := by
+  apply funext=>x; srw kleisli
+  apply LawfulMonad.bind_pure
 
 /- 2.2 (**optional**). Prove that the Kleisli operator is associative. -/
 
 theorem kleisli_assoc {m : Type → Type} [LawfulMonad m] {α β γ δ : Type}
     (f : α → m β) (g : β → m γ) (h : γ → m δ) :
-  ((f >=> g) >=> h) = (f >=> (g >=> h)) :=
-  sorry
+  ((f >=> g) >=> h) = (f >=> (g >=> h)) := by
+  apply funext=>x; srw !kleisli
+  apply LawfulMonad.bind_assoc
 
 end LoVe
