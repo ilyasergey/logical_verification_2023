@@ -1,3 +1,5 @@
 /build/
 /.lake/
 /lake-packages/
+test.*
+*.DS_Store*

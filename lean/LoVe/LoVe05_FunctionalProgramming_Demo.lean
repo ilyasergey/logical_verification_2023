@@ -101,6 +101,8 @@ def illegal : ℕ → ℕ
 
 opaque immoral : ℕ → ℕ
 
+-- #check fun (x y: Nat) => x <= y
+
 axiom immoral_eq (n : ℕ) :
   immoral n = immoral n + 1
 
@@ -241,16 +243,18 @@ theorem head_head {α : Type} [Inhabited α] (xs : List α) :
 
 #check List.head
 
-instance Fun.Inhabited {α β : Type} [Inhabited β] :
+instance Fun_Inhabited {α β : Type} [Inhabited β] :
   Inhabited (α → β) :=
-  { default := fun a : α ↦ Inhabited.default }
+  { default := fun _ : α ↦ Inhabited.default }
 
-instance Prod.Inhabited {α β : Type}
+instance Prod_Inhabited {α β : Type}
     [Inhabited α] [Inhabited β] :
   Inhabited (α × β) :=
   { default := (Inhabited.default, Inhabited.default) }
 
 /- We encountered these type classes in lecture 3: -/
+
+#print Inhabited
 
 #print IsCommutative
 #print IsAssociative
@@ -349,7 +353,7 @@ def headPre {α : Type} : (xs : List α) → xs ≠ [] → α
   | x :: _, hxs => x
 
 #eval headOpt [3, 1, 4]
-#eval headPre [3, 1, 4] (by simp)
+#check headPre [3, 1, 4]  (by simp)
 
 def zip {α β : Type} : List α → List β → List (α × β)
   | x :: xs, y :: ys => (x, y) :: zip xs ys
@@ -369,6 +373,25 @@ conjunction with `Classical.em`. Two cases emerge: one in which the proposition
 is true and one in which it is false. -/
 
 #check Classical.em
+
+#check imp_iff_not_or
+
+-- instance decidable_if (p q : Prop) [h1 : Decidable p]
+--     [h2 : Decidable q] : Decidable (p → q) := by
+--     rw [imp_iff_not_or]
+--     cases h1
+
+-- def myleq (x y : Nat) := x <= y
+
+-- instance myleq_Decidable (x y: Nat) : Decidable (myleq x y) := by
+--   rw [myleq]
+--   have h : (x ≤ y ∨ ¬x ≤ y : Prop) := by exact (Decidable.em (x <= y))
+--   cases h -- struck here
+
+def mymin (x y: Nat) :=
+  bif x <= y then x else y
+
+#print decide
 
 theorem min_add_add (l m n : ℕ) :
   min (m + l) (n + l) = min m n + l :=
@@ -486,9 +509,9 @@ def vecOfList {α : Type} :
   | x :: xs => Vec.cons x (vecOfList xs)
 
 theorem length_listOfVec {α : Type} :
-  ∀(n : ℕ) (v : Vec α n), List.length (listOfVec v) = n
-  | _, Vec.nil      => by rfl
-  | _, Vec.cons a v =>
-    by simp [listOfVec, length_listOfVec _ v]
+  ∀(n : ℕ) (v : Vec α n), List.length (listOfVec v) = n := by
+  intro n v
+  induction v <;> simp [listOfVec]
+  rw [v_ih]
 
 end LoVe

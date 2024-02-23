@@ -39,7 +39,9 @@ theorem add_comm_zero_left (n : ℕ) :
 
 theorem add_comm_zero_left_by_exact (n : ℕ) :
   add 0 n = add n 0 :=
-  by exact add_comm 0 n
+  by
+  let x := 0
+  exact add_comm x n
 
 /- `fix` and `assume` move `∀`-quantified variables and assumptions from the
 goal into the local context. They can be seen as structured versions of the
@@ -65,8 +67,8 @@ theorem fst_of_two_props_no_show (a b : Prop) (ha : a) (hb : b) :
   a :=
   ha
 
-/- `have` proves an intermediate theorem, which can refer to the local
-context. -/
+/- `have` proves an intermediate theorem, which can refer to the local context.
+-/
 
 theorem prop_comp (a b c : Prop) (hab : a → b) (hbc : b → c) :
   a → c :=
@@ -117,7 +119,9 @@ theorem nat_exists_double_iden :
   ∃n : ℕ, double n = n :=
   Exists.intro 0
     (show double 0 = 0 from
-     by rfl)
+    by
+      simp [double]
+    )
 
 theorem nat_exists_double_iden_no_show :
   ∃n : ℕ, double n = n :=
@@ -178,13 +182,11 @@ theorem Exists.one_point {α : Type} (t : α) (P : α → Prop) :
             by
               rw [←hxt]
               exact hpx))
-    (assume hp : P t
-     show ∃x : α, x = t ∧ P x from
-       Exists.intro t
-         (have tt : t = t :=
-            by rfl
-          show t = t ∧ P t from
-            And.intro tt hp))
+    (by
+      intro Hp
+      apply (Exists.intro t)
+      trivial
+    )
 
 
 /- ## Calculational Proofs
@@ -206,7 +208,7 @@ Syntax:
 
 theorem two_mul_example (m n : ℕ) :
   2 * m + n = m + n + m :=
-calc 
+calc
   2 * m + n = m + m + n :=
     by rw [Nat.two_mul]
   _ = m + n + m :=
@@ -216,13 +218,10 @@ calc
 reasoning: -/
 
 theorem two_mul_example_have (m n : ℕ) :
-  2 * m + n = m + n + m :=
-  have hmul : 2 * m + n = m + m + n :=
-    by rw [Nat.two_mul]
-  have hcomm : m + m + n = m + n + m :=
-    by ac_rfl
-  show _ from
-    Eq.trans hmul hcomm
+  2 * m + n = m + n + m := by
+  calc
+    2 * m + n = m + m + n := by rw [Nat.two_mul]
+    _ = m + n + m := by ac_rfl
 
 
 /- ## Forward Reasoning with Tactics

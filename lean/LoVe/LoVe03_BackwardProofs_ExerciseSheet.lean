@@ -25,10 +25,10 @@ Hint: Some strategies for carrying out such proofs are described at the end of
 Section 3.3 in the Hitchhiker's Guide. -/
 
 theorem I (a : Prop) :
-  a → a :=
-  sorry
+  a → a := by
+    intro Ha; exact Ha
 
-theorem K (a b : Prop) :
+theorem K (a b : Prop) :x`
   a → b → b :=
   sorry
 
@@ -53,8 +53,10 @@ theorem some_nonsense (a b c : Prop) :
 /- 1.2. Prove the contraposition rule using basic tactics. -/
 
 theorem contrapositive (a b : Prop) :
-  (a → b) → ¬ b → ¬ a :=
-  sorry
+  (a → b) → ¬ b → ¬ a := by
+    intros H1 H2 H3
+    apply H2; apply H1; trivial
+
 
 /- 1.3. Prove the distributivity of `∀` over `∧` using basic tactics.
 
@@ -63,8 +65,14 @@ forward reasoning, like in the proof of `and_swap_braces` in the lecture, might
 be necessary. -/
 
 theorem forall_and {α : Type} (p q : α → Prop) :
-  (∀x, p x ∧ q x) ↔ (∀x, p x) ∧ (∀x, q x) :=
-  sorry
+  (∀x, p x ∧ q x) ↔ (∀x, p x) ∧ (∀x, q x) := by
+  constructor <;> intro H
+  { constructor <;> intro a <;> cases (H a) <;> trivial }
+  {
+    intro x; constructor <;> cases H
+    apply left; apply right
+  }
+
 
 
 /- ## Question 2: Natural Numbers
@@ -75,33 +83,57 @@ theorem forall_and {α : Type} (p q : α → Prop) :
 #check mul
 
 theorem mul_zero (n : ℕ) :
-  mul 0 n = 0 :=
-  sorry
+  mul 0 n = 0 := by induction n with
+  | zero => simp [mul]
+  | succ n Ih =>
+    simp [mul]; rw [add_zero, Ih]
 
 #check add_succ
+
 theorem mul_succ (m n : ℕ) :
-  mul (Nat.succ m) n = add (mul m n) n :=
-  sorry
+  mul (Nat.succ m) n = add (mul m n) n := by
+  induction n with
+  | zero => simp [mul, add]
+  | succ n Ih =>
+    simp [mul]; rw [add_succ]
+    simp [add]
+    rw [Ih]; ac_rfl
+
 
 /- 2.2. Prove commutativity and associativity of multiplication using the
 `induction` tactic. Choose the induction variable carefully. -/
 
 theorem mul_comm (m n : ℕ) :
   mul m n = mul n m :=
-  sorry
+  by induction n with
+    | zero       => simp [mul, add]; rw [mul_zero]
+    | succ n' ih => simp [mul, add]; rw [mul_succ, ih, add_comm]
 
-theorem mul_assoc (l m n : ℕ) :
-  mul (mul l m) n = mul l (mul m n) :=
-  sorry
 
 /- 2.3. Prove the symmetric variant of `mul_add` using `rw`. To apply
 commutativity at a specific position, instantiate the rule by passing some
 arguments (e.g., `mul_comm _ l`). -/
 
 theorem add_mul (l m n : ℕ) :
-  mul (add l m) n = add (mul n l) (mul n m) :=
-  sorry
+  mul (add l m) n = add (mul n l) (mul n m) := by
+  induction n with
+  | zero => rw [mul_zero, add_zero, mul_zero, mul_comm, mul_zero]
+  | succ n ih =>
+    rw [mul_succ]
+    rw [mul_comm, mul_succ, mul_succ]
+    rw [mul_comm, ih]
+    ac_rfl
 
+theorem mul_assoc (l m n : ℕ) :
+  mul (mul l m) n = mul l (mul m n) :=
+  by induction n with
+    | zero => simp [mul, mul_zero]
+    | succ n ih =>
+      rw [mul_comm l (mul _ _)]
+      rw [mul_comm m (Nat.succ _)]
+      rw [mul_succ, add_mul]
+      simp [mul]
+      rw [add_comm, ih, mul_comm m n]
 
 /- ## Question 3 (**optional**): Intuitionistic Logic
 
@@ -128,7 +160,8 @@ Hint: You will need `Or.elim` and `False.elim`. You can use
 and similarly for `Peirce`. -/
 
 theorem Peirce_of_EM :
-  ExcludedMiddle → Peirce :=
+  ExcludedMiddle → Peirce := by
+  rw [ExcludedMiddle, Peirce]; intros H A B G
   sorry
 
 /- 3.2 (**optional**). Prove the following implication using tactics. -/

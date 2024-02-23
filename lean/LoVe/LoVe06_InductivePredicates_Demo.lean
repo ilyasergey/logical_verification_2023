@@ -3,6 +3,7 @@ Johannes Hölzl, and Jannis Limperg. See `LICENSE.txt`. -/
 
 import LoVe.LoVe04_ForwardProofs_Demo
 import LoVe.LoVe05_FunctionalProgramming_Demo
+import Loogle.Find
 
 
 /- # LoVe Demo 6: Inductive Predicates
@@ -151,6 +152,8 @@ reflexive closure. The third rule achieves the transitive closure.
 The definition is truly elegant. If you doubt this, try implementing `Star` as a
 recursive function: -/
 
+#check Star.rec
+
 def starRec {α : Type} (R : α → α → Bool) :
   α → α → Bool :=
   sorry
@@ -226,7 +229,7 @@ theorem mod_two_Eq_zero_of_Even (n : ℕ) (h : Even n) :
   by
     induction h with
     | zero            => rfl
-    | add_two k hk ih => simp [ih]
+    | add_two k _ ih => simp [ih]
 
 theorem Not_Even_two_mul_add_one (m n : ℕ)
     (hm : m = 2 * n + 1) :
@@ -235,10 +238,10 @@ theorem Not_Even_two_mul_add_one (m n : ℕ)
     intro h
     induction h generalizing n with
     | zero            => linarith
-    | add_two k hk ih =>
+    | add_two k _ ih =>
       apply ih (n - 1)
       cases n with
-      | zero    => simp [Nat.ctor_eq_zero] at *
+      | zero    => simp_all
       | succ n' =>
         simp [Nat.succ_eq_add_one] at *
         linarith
@@ -281,6 +284,7 @@ theorem Star_Star_Iff_Star {α : Type} (R : α → α → Prop)
 
 #check funext
 #check propext
+#print funext
 
 
 /- ## Elimination

@@ -106,7 +106,7 @@ theorem δ_example :
   double 5 = 5 + 5 :=
   by rfl
 
-/- `let` introduces a definition that is locally scoped. Below, `n := 2` is only
+/- `let` introduces a defi]nition that is locally scoped. Below, `n := 2` is only
 in scope in the expression `n + n`. -/
 
 theorem ζ_example :
@@ -158,14 +158,11 @@ Introduction rules: -/
 `p → False`. -/
 
 theorem And_swap (a b : Prop) :
-  a ∧ b → b ∧ a :=
-  by
-    intro hab
-    apply And.intro
-    apply And.right
-    exact hab
-    apply And.left
-    exact hab
+  a ∧ b → b ∧ a := by
+  intro hab
+  cases hab with
+  | intro l r =>  constructor; trivial; trivial
+
 
 /- The above proof step by step:
 
@@ -196,8 +193,7 @@ proof. -/
 opaque f : ℕ → ℕ
 
 theorem f5_if (h : ∀n : ℕ, f n = n) :
-  f 5 = 5 :=
-  by exact h 5
+  f 5 = 5 := by apply h
 
 theorem Or_swap (a b : Prop) :
   a ∨ b → b ∨ a :=
@@ -227,7 +223,7 @@ theorem Exists_double_iden :
   ∃n : ℕ, double n = n :=
   by
     apply Exists.intro 0
-    rfl
+    ac_rfl
 
 
 /- ## Reasoning about Equality -/
@@ -252,11 +248,11 @@ theorem Eq_trans_symm {α : Type} (a b c : α)
 apply an equation right-to-left, prefix its name with `←`. -/
 
 theorem Eq_trans_symm_rw {α : Type} (a b c : α)
-    (hab : a = b) (hcb : c = b) :
+    (hab : a = b) (hcb : b = c) :
   a = c :=
   by
     rw [hab]
-    rw [hcb]
+    rw [<-hcb]
 
 /- `rw` can expand a definition. Below, `¬¬ a` becomes `¬ a → False`, and `¬ a`
 becomes `a → False`. -/
@@ -279,7 +275,10 @@ can be temporarily added to the simp set with the syntax
 theorem cong_two_args_1p1 {α : Type} (a b c d : α)
     (g : α → α → ℕ → α) (hab : a = b) (hcd : c = d) :
   g a c (1 + 1) = g b d 2 :=
-  by simp [hab, hcd]
+  by
+    simp [hab]
+    simp [hcd]
+
 
 /- `ac_rfl` is similar to `rfl`, but it can reason up to associativity and
 commutativity of `+`, `*`, and other binary operators. -/
@@ -298,8 +297,9 @@ theorem add_zero (n : ℕ) :
   add 0 n = n :=
   by
     induction n with
-    | zero       => rfl
-    | succ n' ih => simp [add, ih]
+    | zero       => trivial
+    | succ n' ih => simp [add]; apply ih
+
 
 theorem add_succ (m n : ℕ) :
   add (Nat.succ m) n = Nat.succ (add m n) :=
@@ -336,7 +336,7 @@ theorem mul_add (l m n : ℕ) :
   mul l (add m n) = add (mul l m) (mul l n) :=
   by
     induction n with
-    | zero       => rfl
+    | zero       => simp [mul, add]
     | succ n' ih =>
       simp [add, mul, ih]
       ac_rfl

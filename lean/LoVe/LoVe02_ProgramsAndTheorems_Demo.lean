@@ -92,6 +92,8 @@ def fib : ℕ → ℕ
   | 1     => 1
   | n + 2 => fib (n + 1) + fib n
 
+ #eval fib 20
+
 /- When there are multiple arguments, separate the patterns by `,`: -/
 
 def add : ℕ → ℕ → ℕ
@@ -206,9 +208,31 @@ the result is a proposition rather than data or a function. -/
 
 namespace SorryTheorems
 
-theorem add_comm (m n : ℕ) :
-  add m n = add n m :=
+theorem add_n_zero n : add n 0 = n := by
+  induction n with
+  | zero => simp only [add]
+  | succ n _ => simp only [add]
+
+theorem add_zero_n n : add 0 n = n := by
+  induction n with
+  | zero => simp only [add]
+  | succ n _ =>
+    simp only [add]
+    rw [Nat.succ.injEq]; trivial
+
+theorem add_one n : add 1 n = Nat.succ n := by
+  induction n with
+  | zero => simp only [add]
+  | succ n Hi => simp only [add]; rw [Nat.succ.injEq]; trivial
+
+theorem add_succ_n n m : add (Nat.succ n) m = add n (Nat.succ m) := by
+  simp only [add]
   sorry
+
+theorem add_comm (m n : ℕ) : add m n = add n m := by
+  induction m with
+  | zero => simp; rw [add_n_zero, add_zero_n]
+  | succ m Hi => sorry
 
 theorem add_assoc (l m n : ℕ) :
   add (add l m) n = add l (add m n) :=

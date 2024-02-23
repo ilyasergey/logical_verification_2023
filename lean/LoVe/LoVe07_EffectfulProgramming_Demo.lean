@@ -70,11 +70,14 @@ general `bind` operation. We can also use `pure` instead of `Option.some`: -/
 
 #check bind
 
+#print Bind
+
 def sum257Bind (ns : List ℕ) : Option ℕ :=
   bind (nth ns 1)
     (fun n₂ ↦ bind (nth ns 4)
        (fun n₅ ↦ bind (nth ns 6)
           (fun n₇ ↦ pure (n₂ + n₅ + n₇))))
+
 
 /- By using `bind` and `pure`, `sum257Bind` makes no reference to the
 constructors `Option.none` and `Option.some`.
@@ -121,8 +124,21 @@ def sum257Do (ns : List ℕ) : Option ℕ :=
     let n₇ ← nth ns 6
     pure (n₂ + n₅ + n₇)
 
+/- Question: What are u and v in the definition of Bind?
+
+class Bind (m : Type u → Type v) where
+  /-- If `x : m α` and `f : α → m β`, then `x >>= f : m β` represents the
+  result of executing `x` to get a value of type `α` and then passing it to `f`. -/
+  bind : {α β : Type u} → m α → (α → m β) → m β
+
+-/
+
+#print Bind
+
+
 /- Although the notation has an imperative flavor, the function is a pure
 functional program.
+
 
 
 ## Two Operations and Three Laws
@@ -254,15 +270,15 @@ laws.
 
 Our first monad is the trivial monad `m := id` (i.e., `m := (fun α ↦ α)`). -/
 
-def id.pure {α : Type} : α → id α
-  | a => a
+-- def id.pure {α : Type} : α → id α
+--   | a => a
 
-def id.bind {α β : Type} : id α → (α → id β) → id β
-  | a, f => f a
+-- def id.bind {α β : Type} : id α → (α → id β) → id β
+--   | a, f => f a
 
 instance id.LawfulMonad : LawfulMonad id :=
-  { pure       := id.pure
-    bind       := id.bind
+  { pure       := fun a => a
+    bind       := fun a f => f a
     pure_bind  :=
       by
         intro α β a f
@@ -335,8 +351,7 @@ def Action.pure {σ α : Type} (a : α) : Action σ α
   | s => (a, s)
 
 def Action.bind {σ : Type} {α β : Type} (ma : Action σ α)
-    (f : α → Action σ β) :
-  Action σ β
+    (f : α → Action σ β) : Action σ β
   | s =>
     match ma s with
     | (a, s') => f a s'
@@ -353,15 +368,17 @@ instance Action.LawfulMonad {σ : Type} :
     pure_bind  :=
       by
         intro α β a f
-        simp [Pure.pure, Bind.bind, Action.pure, Action.bind]
+        rfl
     bind_pure  :=
       by
         intro α ma
-        simp [Pure.pure, Bind.bind, Action.pure, Action.bind]
+        rfl
     bind_assoc :=
       by
         intro α β γ f g ma
-        simp [Pure.pure, Bind.bind, Action.pure, Action.bind] }
+        rfl
+        -- simp [Pure.pure, Bind.bind, Action.pure, Action.bind]
+  }
 
 def increasingly : List ℕ → Action ℕ (List ℕ)
   | []        => pure []
@@ -411,7 +428,10 @@ instance Set.LawfulMonad : LawfulMonad Set :=
         intro α β γ f g ma
         simp [Pure.pure, Bind.bind, Set.pure, Set.bind]
         apply Set.ext
-        aesop }
+        intro x
+        aesop
+        -- Can we prove it using SSR
+        }
 
 /- `aesop` is a general-purpose proof search tactic. Among others, it performs
 elimination of the logical symbols `∧`, `∨`, `↔`, and `∃` in hypotheses and

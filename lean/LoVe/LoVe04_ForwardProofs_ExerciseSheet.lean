@@ -79,7 +79,12 @@ Hint: This is a difficult question. You might need the tactics `simp` and
 
 theorem binomial_square (a b : ℕ) :
   (a + b) * (a + b) = a * a + 2 * a * b + b * b :=
-  sorry
+  calc
+    (a + b) * (a + b) = a * (a + b) + b * (a + b) := by rw [add_mul]
+    _ = a * a + a * b + b * a + b * b := by rw [mul_add, mul_add, <-add_assoc]
+    _ = a * a + a * b + a * b + b * b := by rw [mul_comm a b]
+    _= a * a + 2 * a * b + b * b := by rw [add_assoc (a*a) _, <- Nat.two_mul (a*b), mul_assoc]
+
 
 /- 2.2 (**optional**). Prove the same argument again, this time as a structured
 proof, with `have` steps corresponding to the `calc` equations. Try to reuse as
@@ -98,9 +103,17 @@ rule for `∀` is inconsistent, using a structured proof. -/
 axiom All.one_point_wrong {α : Type} (t : α) (P : α → Prop) :
   (∀x : α, x = t ∧ P x) ↔ P t
 
-theorem All.proof_of_False :
-  False :=
-  sorry
+#check All.one_point_wrong 1 (fun x ↦ x = 1)
+
+theorem All.proof_of_False : False :=
+  False.elim (
+    have triv: 1 = 1 := by rfl
+    -- #check Iff.mpr (All.one_point_wrong 1 (fun x ↦ x = 1)) triv;
+    by
+      let H := Iff.mpr (All.one_point_wrong 1 (fun x ↦ x = 1)) triv
+      let G := H 2
+      trivial
+  )
 
 /- 3.2 (**optional**). Prove that the following wrong formulation of the
 one-point rule for `∃` is inconsistent, using a structured proof. -/

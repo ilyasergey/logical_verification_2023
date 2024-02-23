@@ -257,6 +257,6 @@ opaque β : Type
 opaque γ : Type
 
 def someFunOfType : (α → β → γ) → ((β → α) → β) → α → γ :=
-  fun f g a ↦ f a (g (fun b ↦ a))
+  fun f g x ↦ f x (g (fun _ ↦ x))
 
 end LoVe
