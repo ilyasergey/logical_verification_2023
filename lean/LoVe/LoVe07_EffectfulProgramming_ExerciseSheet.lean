@@ -58,11 +58,11 @@ def Option.orelse {α : Type} : Option α → Option α → Option α
   { Option.LawfulMonad with
     emp          := Option.none
     orelse       := Option.orelse
-    emp_orelse   := by move=>? ma//=
-    orelse_emp   := by move=>? [|a]//=
-    orelse_assoc := by move=> T [|a] [|b] [|c]//=
-    emp_bind     := by move=>α β f/=; rfl
-    bind_emp     := by move=>T S [|a]/= <;> srw Bind.bind //
+    emp_orelse   := by sdone
+    orelse_emp   := by sby move=>? []
+    orelse_assoc := by sby move=> T [|a] [|b] [|c]
+    emp_bind     := by sby move=>α β f
+    bind_emp     := by sby move=>T S [|a]/= <;> srw Bind.bind
   }
 
 @[simp] theorem Option.some_bind {α β : Type} (a : α) (g : α → Option β) :
@@ -134,7 +134,7 @@ Hints:
 
 @[instance] def FAction.LawfulMonad {σ : Type} : LawfulMonad (FAction σ) :=
   { FAction.Bind, FAction.Pure with
-    pure_bind := by move=>?? a f //
+    pure_bind := by sdone
     bind_pure :=
       by
         -- This proof was give
@@ -144,9 +144,8 @@ Hints:
         simp [FAction.bind_apply, FAction.pure_apply]
         apply LawfulMonad.bind_pure
     bind_assoc := by
-      move=>??? f g ma
+      move=>* !x -- ! is a new intro pattern to intro variables under funext
       -- If you just type "apply" below, Lean panics
-      apply funext=>x
       simp [FAction.bind_apply]
       -- Vova: can I do it better?
   }
@@ -171,14 +170,14 @@ Kleisli operator. -/
 theorem pure_kleisli {m : Type → Type} [LawfulMonad m] {α β : Type}
     (f : α → m β) :
   (pure >=> f) = f := by
-  apply funext=>x; srw kleisli
+  move=>!x; srw kleisli
   apply LawfulMonad.pure_bind
 
 
 theorem kleisli_pure {m : Type → Type} [LawfulMonad m] {α β : Type}
     (f : α → m β) :
   (f >=> pure) = f := by
-  apply funext=>x; srw kleisli
+  move=>!x; srw kleisli
   apply LawfulMonad.bind_pure
 
 /- 2.2 (**optional**). Prove that the Kleisli operator is associative. -/
@@ -186,7 +185,7 @@ theorem kleisli_pure {m : Type → Type} [LawfulMonad m] {α β : Type}
 theorem kleisli_assoc {m : Type → Type} [LawfulMonad m] {α β γ δ : Type}
     (f : α → m β) (g : β → m γ) (h : γ → m δ) :
   ((f >=> g) >=> h) = (f >=> (g >=> h)) := by
-  apply funext=>x; srw !kleisli
+  move=>!x; srw !kleisli
   apply LawfulMonad.bind_assoc
 
 end LoVe
