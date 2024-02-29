@@ -5,8 +5,9 @@ import LoVe.LoVe07_EffectfulProgramming_Demo
 import Ssreflect.Lang
 
 
-example {α : Type} : α → α := by
-  move=> x; trivial
+-- example {α : Type} : α → α → α := by
+--   move=> x y
+--   move: α;
 
 
 /- # LoVe Exercise 7: Effectful Programming
@@ -18,9 +19,6 @@ set_option autoImplicit false
 set_option tactic.hygienic false
 
 namespace LoVe
-
-
-
 
 /- ## Question 1: A State Monad with Failure
 
