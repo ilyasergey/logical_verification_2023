@@ -59,8 +59,8 @@ def Option.orelse {α : Type} : Option α → Option α → Option α
     emp_orelse   := by move=>? ma//=
     orelse_emp   := by move=>? [|a]//=
     orelse_assoc := by move=> T [|a] [|b] [|c]//=
-    emp_bind     := by move=>α β f/=; rfl
-    bind_emp     := by move=>T S [|a]/= <;> srw Bind.bind //
+    emp_bind     := by move=>α β ?//=
+    bind_emp     := by move=>T S [|?]/=
   }
 
 @[simp] theorem Option.some_bind {α β : Type} (a : α) (g : α → Option β) :
@@ -140,12 +140,16 @@ Hints:
         apply funext
         intro s
         simp [FAction.bind_apply, FAction.pure_apply]
-        apply LawfulMonad.bind_pure
+        move=>//=
+        srw _root_.Option.bind Pure.pure //=
+        scase: (ma s)=>//
     bind_assoc := by
       move=>??? f g ma
       -- If you just type "apply" below, Lean panics
-      apply funext=>x
-      simp [FAction.bind_apply]
+      apply funext=>x //==
+      srw !FAction.bind_apply //=
+      srw !_root_.Option.bind
+      scase: (ma x)=>//
       -- Vova: can I do it better?
   }
 

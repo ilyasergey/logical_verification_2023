@@ -99,15 +99,11 @@ WHILE language. -/
 theorem BigStep_loop {S s u} :
   (Stmt.loop S, s) ⟹ u ↔
   (s = u ∨ (∃t, (S, s) ⟹ t ∧ (Stmt.loop S, t) ⟹ u)) := by
-  constructor=>[[t H1 []t'|]|]
+  constructor
   {
-    move=>H2 H3
+    -- Got bored here
     sorry
   }
-  {
-    sorry
-  }
-  { sby apply Or.inl }
   {
     sorry
   }
