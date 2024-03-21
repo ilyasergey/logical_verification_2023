@@ -2,7 +2,7 @@
 Johannes Hölzl, and Jannis Limperg. See `LICENSE.txt`. -/
 
 import LoVe.LoVelib
-
+import Ssreflect.Lang
 
 /- # LoVe Demo 9: Operational Semantics
 
@@ -264,7 +264,9 @@ theorem sillyLoop_from_1_BigStep :
   by
     rw [sillyLoop]
     apply BigStep.while_true
-    { simp }
+    {
+      simp =>//
+    }
     { apply BigStep.seq
       { apply BigStep.skip }
       { apply BigStep.assign } }
@@ -283,8 +285,8 @@ Equipped with a big-step semantics, we can
 * reason about **concrete programs**, proving theorems relating final states `t`
   with initial states `s`. -/
 
-theorem BigStep_deterministic {Ss l r} (hl : Ss ⟹ l)
-    (hr : Ss ⟹ r) :
+-- Work out through it
+theorem BigStep_deterministic {Ss l r} (hl : Ss ⟹ l) (hr : Ss ⟹ r) :
   l = r :=
   by
     induction hl generalizing r with
@@ -521,8 +523,10 @@ theorem sillyLoop_from_1_SmallStep :
     apply RTC.head
     { apply SmallStep.whileDo }
     { apply RTC.head
-      { apply SmallStep.if_true
-        simp }
+      { apply SmallStep.if_true =>//
+
+        -- WTH this is not solved?
+         }
       { apply RTC.head
         { apply SmallStep.seq_step
           apply SmallStep.seq_skip }

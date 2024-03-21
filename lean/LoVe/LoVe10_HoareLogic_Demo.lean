@@ -131,10 +131,7 @@ namespace PartialHoare
 
 theorem skip_intro {P} :
   {* P *} (Stmt.skip) {* P *} :=
-  by
-    intro s t hs hst
-    cases hst
-    assumption
+  by sby move=>??? []
 
 theorem assign_intro (P) {x a} :
   {* fun s ↦ P (s[x ↦ a s]) *} (Stmt.assign x a) {* P *} :=

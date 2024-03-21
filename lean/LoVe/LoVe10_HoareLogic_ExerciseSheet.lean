@@ -2,6 +2,7 @@
 Johannes Hölzl, and Jannis Limperg. See `LICENSE.txt`. -/
 
 import LoVe.LoVe10_HoareLogic_Demo
+import Ssreflect.Lang
 
 
 /- # LoVe Exercise 10: Hoare Logic

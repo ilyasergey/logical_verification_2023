@@ -2,6 +2,7 @@
 Johannes Hölzl, and Jannis Limperg. See `LICENSE.txt`. -/
 
 import LoVe.LoVe09_OperationalSemantics_Demo
+import Ssreflect.Lang
 
 
 /- # LoVe Exercise 9: Operational Semantics
@@ -56,15 +57,24 @@ specification of GCL above. -/
 
 inductive BigStep : (Stmt × State) → State → Prop
   -- enter the missing `assign` rule here
-  | assert (B s) (hB : B s) :
-    BigStep (Stmt.assert B, s) s
-  -- enter the missing `seq` rule here
+  | assign (x a s) :
+    BigStep (Stmt.assign x a, s) (s[x ↦ a s])
+  | assert (B s) (hB : B s) : BigStep (Stmt.assert B, s) s
+  | seq (S T s t u) (hS : BigStep (S, s) t)
+      (hT : BigStep (T, t) u) : BigStep (Stmt.seq S T, s) u
   -- below, `Ss[i]'hless` returns element `i` of `Ss`, which exists thanks to
   -- condition `hless`
   | choice (Ss s t i) (hless : i < List.length Ss)
+      -- What's the syntax
       (hbody : BigStep (Ss[i]'hless, s) t) :
     BigStep (Stmt.choice Ss, s) t
   -- enter the missing `loop` rules here
+  | loop_step (S s t u)
+      (hbody : BigStep (S, s) t)
+      (hrest : BigStep (Stmt.loop S, t) u) :
+    BigStep (Stmt.loop S, s) u
+  | loop_nada (S s) :
+    BigStep (Stmt.loop S, s) s
 
 infixl:110 " ⟹ " => BigStep
 
@@ -72,28 +82,45 @@ infixl:110 " ⟹ " => BigStep
 WHILE language. -/
 
 @[simp] theorem BigStep_assign_iff {x a s t} :
-  (Stmt.assign x a, s) ⟹ t ↔ t = s[x ↦ a s] :=
-  sorry
+  (Stmt.assign x a, s) ⟹ t ↔ t = s[x ↦ a s] := by
+  sby constructor=>//[]
+
 
 @[simp] theorem BigStep_assert {B s t} :
-  (Stmt.assert B, s) ⟹ t ↔ t = s ∧ B s :=
-  sorry
+  (Stmt.assert B, s) ⟹ t ↔ t = s ∧ B s := by
+  sby constructor=>//[]
 
-@[simp] theorem BigStep_seq_iff {S₁ S₂ s t} :
-  (Stmt.seq S₁ S₂, s) ⟹ t ↔ (∃u, (S₁, s) ⟹ u ∧ (S₂, u) ⟹ t) :=
-  sorry
+@[simp] theorem BigStep_seq_iff {S1 S2 s t} :
+  (Stmt.seq S1 S2, s) ⟹ t ↔ (∃u, (S1, s) ⟹ u ∧ (S2, u) ⟹ t) := by
+  constructor=>//
+  { sby scase=>t' H1 H2; exists t' }
+  { sby move=>[u [H1 H2]]; apply (BigStep.seq S1 S2 s u) }
 
 theorem BigStep_loop {S s u} :
   (Stmt.loop S, s) ⟹ u ↔
-  (s = u ∨ (∃t, (S, s) ⟹ t ∧ (Stmt.loop S, t) ⟹ u)) :=
-  sorry
+  (s = u ∨ (∃t, (S, s) ⟹ t ∧ (Stmt.loop S, t) ⟹ u)) := by
+  constructor=>[[t H1 []t'|]|]
+  {
+    move=>H2 H3
+    sorry
+  }
+  {
+    sorry
+  }
+  { sby apply Or.inl }
+  {
+    sorry
+  }
+
 
 /- This one is more difficult: -/
 
 @[simp] theorem BigStep_choice {Ss s t} :
   (Stmt.choice Ss, s) ⟹ t ↔
-  (∃(i : ℕ) (hless : i < List.length Ss), (Ss[i]'hless, s) ⟹ t) :=
-  sorry
+  (∃(i : ℕ) (hless : i < List.length Ss), (Ss[i]'hless, s) ⟹ t) := by
+  constructor=>[[]i hls H1 |[] i [hls] H]
+  { exists i <;> exists hls }
+  { sby apply (BigStep.choice Ss s t i) }
 
 end GCL
 
