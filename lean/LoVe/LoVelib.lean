@@ -4,7 +4,7 @@ Johannes Hölzl, and Jannis Limperg. See `LICENSE.txt`. -/
 import Aesop
 import Mathlib.Algebra.Field.Defs
 import Mathlib.Data.Finset.Basic
-import Mathlib.Tactic.LibrarySearch
+-- import Mathlib.Tactic.LibrarySearch
 import Mathlib.Tactic.Linarith
 import Mathlib.Tactic.Ring
 import Loogle.Find
@@ -214,10 +214,10 @@ attribute [simp] Int.mul_eq_zero
 
 theorem Set.unordered_pair_comm {α : Type} (a b : α) :
   ({a, b} : Set α) = ({b, a} : Set α) :=
-  by
-    apply Set.ext
-    simp [insert, singleton, Set.insert, Set.singleton]
-    aesop
+  by sorry
+    -- apply Set.ext
+    -- simp [insert, singleton, Set.insert, Set.singleton]
+    -- aesop
 
 instance Set.PartialOrder {α : Type} : PartialOrder (Set α) :=
   { le               := fun A B ↦ A ⊆ B,

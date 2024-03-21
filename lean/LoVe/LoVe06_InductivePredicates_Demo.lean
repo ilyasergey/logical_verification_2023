@@ -3,7 +3,7 @@ Johannes Hölzl, and Jannis Limperg. See `LICENSE.txt`. -/
 
 import LoVe.LoVe04_ForwardProofs_Demo
 import LoVe.LoVe05_FunctionalProgramming_Demo
-import Loogle.Find
+-- import Loogle.Find
 
 
 /- # LoVe Demo 6: Inductive Predicates

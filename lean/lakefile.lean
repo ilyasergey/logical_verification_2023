@@ -10,6 +10,6 @@ lean_lib LoVe {
   globs := #[Glob.submodules `LoVe]
 }
 
-require mathlib from git "https://github.com/leanprover-community/mathlib4" @ "v4.4.0"
+require mathlib from git "https://github.com/leanprover-community/mathlib4" @ "master"
 require loogle from git "https://github.com/nomeata/loogle.git"
-require Ssreflect from git "https://github.com/verse-lab/ssr-lean" @"v1.0"
+require ssreflect from git "https://github.com/verse-lab/ssr-lean" @ "master"

@@ -2,7 +2,7 @@
 Johannes Hölzl, and Jannis Limperg. See `LICENSE.txt`. -/
 
 import LoVe.LoVe04_ForwardProofs_Demo
-import Loogle.Find
+-- import Loogle.Find
 
 /- # LoVe Exercise 5: Functional Programming
 
