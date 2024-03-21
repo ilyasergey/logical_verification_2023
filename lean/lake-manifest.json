@@ -67,7 +67,7 @@
   {"url": "https://github.com/verse-lab/ssr-lean",
    "type": "git",
    "subDir": null,
-   "rev": "d2000f50a9f56ac964bd2662bec7a6dfcc472523",
+   "rev": "cce76d9b7d08d2a9384d5ca0a7328b17d9cd522f",
    "name": "Ssreflect",
    "manifestFile": "lake-manifest.json",
    "inputRev": null,
