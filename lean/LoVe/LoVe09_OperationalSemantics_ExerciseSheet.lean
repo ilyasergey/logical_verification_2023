@@ -100,14 +100,11 @@ theorem BigStep_loop {S s u} :
   (Stmt.loop S, s) ⟹ u ↔
   (s = u ∨ (∃t, (S, s) ⟹ t ∧ (Stmt.loop S, t) ⟹ u)) := by
   constructor
-  {
-    -- Got bored here
-    sorry
-  }
-  {
-    sorry
-  }
-
+  -- Weirdly, I can't use ; below
+  { scase=>//t H1 H2; apply Or.inr <;> exists t }
+  scase=>[->{s}|![t H1 H2]]
+  { apply BigStep.loop_nada }
+  sby apply BigStep.loop_step
 
 /- This one is more difficult: -/
 
