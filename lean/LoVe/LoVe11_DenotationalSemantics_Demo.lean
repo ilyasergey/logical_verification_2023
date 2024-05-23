@@ -271,6 +271,7 @@ instance Set.CompleteLattice {α : Type} :
   CompleteLattice (Set α) :=
   { @Set.PartialOrder α with
     Inf         := fun X ↦ {a | ∀A, A ∈ X → a ∈ A}
+    -- Okay, now this is just not fun anymore.
     Inf_le      := by aesop
     le_Inf      := by aesop }
 
@@ -299,21 +300,16 @@ theorem lfp_eq {α : Type} [CompleteLattice α] (f : α → α)
     (hf : Monotone f) :
   lfp f = f (lfp f) :=
   by
-    have h : f (lfp f) ≤ lfp f :=
-      by
-        apply le_lfp
-        intro a' ha'
-        apply le_trans
-        { apply hf
-          apply lfp_le
-          assumption }
-        { assumption }
-    apply le_antisymm
-    { apply lfp_le
+    have h: f (lfp f) ≤ lfp f := by
+      apply le_lfp=>x H
+      move: (H); apply le_trans
       apply hf
-      assumption }
-    { assumption }
-
+      sby apply lfp_le
+    apply le_antisymm=>//
+    {
+      apply lfp_le
+      sby apply hf
+    }
 
 /- ## A Relational Denotational Semantics, Continued -/
 

@@ -96,13 +96,31 @@ Hint: Exploit the correspondence with the WHILE language. -/
 def rel_of_Regex {α : Type} : Regex (Set (α × α)) → Set (α × α)
   | Regex.nothing      => ∅
   | Regex.empty        => Id
+  -- [TODO: Discuss]
+  -- No good intuition for this so far, just following the spec above
+  | Regex.atom a       => a
+  | Regex.concat r1 r2 => rel_of_Regex r1 ◯ rel_of_Regex r2
+  | Regex.alt r1 r2    => rel_of_Regex r1 ∪ rel_of_Regex r2
+  | Regex.star r       => lfp (fun X ↦ (rel_of_Regex r ◯ X) ∪ Id)
+
+   -- {st | Prod.snd st = (Prod.fst st)[x ↦ a (Prod.fst st)]}
   -- enter the missing cases here
 
 /- 2.2. Prove the following recursive equation about your definition. -/
 
+lemma Monotone_star_lfp_arg {α : Type} (r : Regex (Set (α × α))) :
+  Monotone (fun X ↦ (rel_of_Regex r ◯ X) ∪ Id) := by
+  apply Monotone_union
+  {
+    sby apply Monotone_comp <;> move=>???/=
+  }
+  {sby move=>???/=}
+
 theorem rel_of_Regex_Star {α : Type} (r : Regex (Set (α × α))) :
   rel_of_Regex (Regex.star r) =
-  rel_of_Regex (Regex.alt (Regex.concat r (Regex.star r)) Regex.empty) :=
-  sorry
+  rel_of_Regex (Regex.alt (Regex.concat r (Regex.star r)) Regex.empty) := by
+  srw !rel_of_Regex=>//=
+  apply lfp_eq
+  sby apply Monotone_star_lfp_arg
 
 end LoVe
