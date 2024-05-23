@@ -260,19 +260,22 @@ inductive BigStep : Stmt × State → State → Prop where
 infix:110 " ⟹ " => BigStep
 
 theorem sillyLoop_from_1_BigStep :
-  (sillyLoop, (fun _ ↦ 0)["x" ↦ 1]) ⟹ (fun _ ↦ 0) :=
-  by
-    rw [sillyLoop]
-    apply BigStep.while_true
-    {
-      simp =>//
-    }
-    { apply BigStep.seq
-      { apply BigStep.skip }
-      { apply BigStep.assign } }
-    { simp
-      apply BigStep.while_false
-      simp }
+  (sillyLoop, (fun _ ↦ 0)["x" ↦ 1]) ⟹ (fun _ ↦ 0) := by
+  apply BigStep.while_true=>//==
+  sby apply BigStep.while_false=>//
+
+
+    -- rw [sillyLoop]
+    -- apply BigStep.while_true
+    -- {
+    --   simp =>//
+    -- }
+    -- { apply BigStep.seq
+    --   { apply BigStep.skip }
+    --   { apply BigStep.assign } }
+    -- { simp
+    --   apply BigStep.while_false
+    --   simp }
 
 
 /- ## Properties of the Big-Step Semantics
@@ -288,42 +291,16 @@ Equipped with a big-step semantics, we can
 -- Work out through it
 theorem BigStep_deterministic {Ss l r} (hl : Ss ⟹ l) (hr : Ss ⟹ r) :
   l = r :=
-  by
-    induction hl generalizing r with
-    | skip s =>
-      cases hr with
-      | skip => rfl
-    | assign x a s =>
-      cases hr with
-      | assign => rfl
-    | seq S T s l₀ l hS hT ihS ihT =>
-      cases hr with
-      | seq _ _ _ r₀ _ hS' hT' =>
-        cases ihS hS' with
-        | refl =>
-          cases ihT hT' with
-          | refl => rfl
-    | if_true B S T s l hB hS ih =>
-      cases hr with
-      | if_true _ _ _ _ _ hB' hS'  => apply ih hS'
-      | if_false _ _ _ _ _ hB' hS' => aesop
-    | if_false B S T s l hB hT ih =>
-      cases hr with
-      | if_true _ _ _ _ _ hB' hS'  => aesop
-      | if_false _ _ _ _ _ hB' hS' => apply ih hS'
-    | while_true B S s l₀ l hB hS hw ihS ihw =>
-      cases hr with
-      | while_true _ _ _ r₀ hB' hB' hS' hw' =>
-        cases ihS hS' with
-        | refl =>
-          cases ihw hw' with
-          | refl => rfl
-      | while_false _ _ _ hB' => aesop
-    | while_false B S s hB =>
-      cases hr with
-      | while_true _ _ _ s' _ hB' hS hw => aesop
-      | while_false _ _ _ hB'           => rfl
-
+  by sby
+    elim: hl r => > => [ []
+     |  []
+     |  ?? ih1 ih2 ? [?]/ih1<-/ih2
+     |  ?? ih ? [] // ? /ih
+     |  ?? ih ? [] // ? /ih
+     |  ?? ? ih2 ih3  ? [
+      ?? /ih2 <- /ih3
+      | ]
+    | ?? [] ]
 
 theorem BigStep_terminates {S s} :
   ∃t, (S, s) ⟹ t :=

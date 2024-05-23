@@ -286,6 +286,11 @@ theorem Star_Star_Iff_Star {α : Type} (R : α → α → Prop)
 #check propext
 #print funext
 
+#print Nat.rec
+
+
+theorem counterexample (A: Type) (P: A → Prop) :
+   (∃x: A, ¬P x) →  ¬(∀ x, P x)
 
 /- ## Elimination
 

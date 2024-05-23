@@ -2,6 +2,7 @@
 Johannes Hölzl, and Jannis Limperg. See `LICENSE.txt`. -/
 
 import LoVe.LoVe09_OperationalSemantics_Demo
+import SSreflect.Lang
 
 
 /- # LoVe Demo 11: Denotational Semantics
@@ -192,13 +193,24 @@ namespace SorryTheorems
 theorem Monotone_comp {α β : Type} [PartialOrder α]
     (f g : α → Set (β × β)) (hf : Monotone f)
     (hg : Monotone g) :
-  Monotone (fun a ↦ f a ◯ g a) :=
-  sorry
+  Monotone (fun a ↦ f a ◯ g a) := by
+  move=>a1 a2 Hl/=; srw !comp//
+  -- move=>[x y][b]//= [Hf Hg]
+  -- move: (hf a1 a2 Hl)=>H1
+  -- move: (hg a1 a2 Hl)=>H2
+  -- exists b
+  -- constructor
+  -- {sby apply H1}
+  -- sby apply H2
+  aesop
 
 theorem Monotone_restrict {α β : Type} [PartialOrder α]
     (f : α → Set (β × β)) (P : β → Prop) (hf : Monotone f) :
-  Monotone (fun a ↦ f a ⇃ P) :=
-  sorry
+  Monotone (fun a ↦ f a ⇃ P) := by
+  move=>a1 a2 Hl/=; srw !restrict=>[x y]//==H1 H2
+  constructor=>//
+  move: (hf _ _ Hl)=>H2
+  sby apply H2
 
 end SorryTheorems
 

@@ -2,6 +2,7 @@
 Johannes Hölzl, and Jannis Limperg. See `LICENSE.txt`. -/
 
 import LoVe.LoVe11_DenotationalSemantics_Demo
+import SSreflect.Lang
 
 
 /- # LoVe Exercise 11: Denotational Semantics
@@ -19,18 +20,29 @@ namespace LoVe
 
 1.1. Prove the following theorem from the lecture. -/
 
-theorem Monotone_restrict {α β : Type} [PartialOrder α] (f : α → Set (β × β))
-    (p : β → Prop) (hf : Monotone f) :
-  Monotone (fun a ↦ f a ⇃ p) :=
-  sorry
+theorem Monotone_restrict {α β : Type} [PartialOrder α]
+    (f : α → Set (β × β)) (P : β → Prop) (hf : Monotone f) :
+  Monotone (fun a ↦ f a ⇃ P) := by
+  move=>a1 a2 Hl/=; srw !restrict=>[x y]//==H1 H2
+  constructor=>//
+  move: (hf _ _ Hl)=>H2
+  sby apply H2
 
 /- 1.2. Prove its cousin. -/
 
-theorem Monotone_comp {α β : Type} [PartialOrder α] (f g : α → Set (β × β))
-    (hf : Monotone f) (hg : Monotone g) :
-  Monotone (fun a ↦ f a ◯ g a) :=
-  sorry
-
+theorem Monotone_comp {α β : Type} [PartialOrder α]
+    (f g : α → Set (β × β)) (hf : Monotone f)
+    (hg : Monotone g) :
+  Monotone (fun a ↦ f a ◯ g a) := by
+  move=>a1 a2 Hl/=; srw !comp//
+  -- move=>[x y][b]//= [Hf Hg]
+  -- move: (hf a1 a2 Hl)=>H1
+  -- move: (hg a1 a2 Hl)=>H2
+  -- exists b
+  -- constructor
+  -- {sby apply H1}
+  -- sby apply H2
+  aesop
 
 /- ## Question 2: Regular Expressions
 

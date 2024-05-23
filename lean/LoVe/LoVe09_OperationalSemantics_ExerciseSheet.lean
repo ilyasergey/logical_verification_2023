@@ -56,17 +56,17 @@ infixr:90 "; " => Stmt.seq
 specification of GCL above. -/
 
 inductive BigStep : (Stmt × State) → State → Prop
-  -- enter the missing `assign` rule here
   | assign (x a s) :
     BigStep (Stmt.assign x a, s) (s[x ↦ a s])
-  | assert (B s) (hB : B s) : BigStep (Stmt.assert B, s) s
+  | assert (B s) (hB : B s) :
+      BigStep (Stmt.assert B, s) s
   | seq (S T s t u) (hS : BigStep (S, s) t)
       (hT : BigStep (T, t) u) : BigStep (Stmt.seq S T, s) u
   -- below, `Ss[i]'hless` returns element `i` of `Ss`, which exists thanks to
   -- condition `hless`
   | choice (Ss s t i) (hless : i < List.length Ss)
       -- What's the syntax
-      (hbody : BigStep (Ss[i]'hless, s) t) :
+      (hbody : BigStep (Ss[i], s) t) :
     BigStep (Stmt.choice Ss, s) t
   -- enter the missing `loop` rules here
   | loop_step (S s t u)
@@ -124,13 +124,29 @@ def gcl_of : Stmt → GCL.Stmt
   | Stmt.skip =>
     GCL.Stmt.assert (fun _ ↦ True)
   | Stmt.assign x a =>
-    sorry
+    GCL.Stmt.assign x a
   | S; T =>
-    sorry
+    GCL.Stmt.seq (gcl_of S) (gcl_of T)
   | Stmt.ifThenElse B S T  =>
-    sorry
-  | Stmt.whileDo B S =>
-    sorry
+    let S1 := gcl_of S
+    let T1 := gcl_of T
+    GCL.Stmt.choice [
+      GCL.Stmt.seq (GCL.Stmt.assert B) S1,
+      GCL.Stmt.seq (GCL.Stmt.assert (fun s ↦ ¬ B s)) T1
+    ]
+  | Stmt.whileDo B S => by sorry
+    -- GCL.Stmt.loop
+
+    -- GCL.Stmt.choice [
+    --   -- The condition is false
+
+
+    --   GCL.Stmt.seq (GCL.Stmt.assert (fun s ↦ ¬ B s))
+    --     (GCL.Stmt.assert (fun _ ↦ True)),
+    --         GCL.Stmt.seq (GCL.Stmt.assert (fun s ↦ ¬ B s))
+    --     (gcl_of S)
+
+    -- ]
 
 /- 1.4. In the definition of `gcl_of` above, `skip` is translated to
 `assert (fun _ ↦ True)`. Looking at the big-step semantics of both constructs,

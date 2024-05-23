@@ -135,23 +135,13 @@ theorem skip_intro {P} :
 
 theorem assign_intro (P) {x a} :
   {* fun s ↦ P (s[x ↦ a s]) *} (Stmt.assign x a) {* P *} :=
-  by
-    intro s t P' hst
-    cases hst with
-    | assign => assumption
+  by sby move=>??? []
 
 theorem seq_intro {P Q R S T} (hS : {* P *} (S) {* Q *})
     (hT : {* Q *} (T) {* R *}) :
   {* P *} (S; T) {* R *} :=
-  by
-    intro s t hs hst
-    cases hst with
-    | seq _ _ _ u d hS' hT' =>
-      apply hT
-      { apply hS
-        { exact hs }
-        { assumption } }
-      { assumption }
+  by move=>s t hs; scase=>//= ???
+     sby apply hT=>//; apply hS
 
 theorem if_intro {B P Q S T}
     (hS : {* fun s ↦ P s ∧ B s *} (S) {* Q *})
@@ -276,7 +266,6 @@ theorem SWAP_correct (a₀ b₀ : ℕ) :
     apply PartialHoare.assign_intro
     apply PartialHoare.assign_intro'
     aesop
-
 
 /- ## Second Program: Adding Two Numbers -/
 
