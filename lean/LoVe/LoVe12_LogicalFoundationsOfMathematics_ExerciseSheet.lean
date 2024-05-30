@@ -2,7 +2,7 @@
 Johannes Hölzl, and Jannis Limperg. See `LICENSE.txt`. -/
 
 import LoVe.LoVe12_LogicalFoundationsOfMathematics_Demo
-
+import SSreflect.Lang
 
 /- # LoVe Exercise 12: Logical Foundations of Mathematics
 

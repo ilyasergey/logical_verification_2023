@@ -2,7 +2,7 @@
 Johannes Hölzl, and Jannis Limperg. See `LICENSE.txt`. -/
 
 import LoVe.LoVe06_InductivePredicates_Demo
-
+import SSreflect.Lang
 
 /- # LoVe Demo 12: Logical Foundations of Mathematics
 
