@@ -80,16 +80,22 @@ Lean's predefined type `Int` (= `ℤ`): -/
 an integer, then `(n, p)` represents its negation. -/
 
 def Int.neg : Int → Int :=
-  sorry
+  Quotient.lift (fun (p, n) => ⟦(n, p)⟧) (by
+    move=>[ap an][bp bn]H//==; apply Quotient.sound
+    move: H; srw !Int.Setoid_Iff//=
+    srw [1]Nat.add_comm=>->
+    sby linarith)
 
 /- 2.2. Prove the following theorems about negation. -/
 
 theorem Int.neg_eq (p n : ℕ) :
-  Int.neg ⟦(p, n)⟧ = ⟦(n, p)⟧ :=
-  sorry
+  Int.neg ⟦(p, n)⟧ = ⟦(n, p)⟧ := by sdone
+#check Quotient.inductionOn
 
 theorem int.neg_neg (a : Int) :
-  Int.neg (Int.neg a) = a :=
-  sorry
+  Int.neg (Int.neg a) = a := by
+    -- WTF is happening here?
+    induction a using Quotient.inductionOn with
+    | h pn => scase: pn => ??//=
 
 end LoVe
