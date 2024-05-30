@@ -27,8 +27,8 @@ function is longer than the other, the tail of the longer list is ignored. -/
 def List.add : List ℤ → List ℤ → List ℤ
   | [],      []      => []
   | x :: xs, y :: ys => (x + y) :: List.add xs ys
-  | [],      y :: ys => []
-  | x :: xs, []      => []
+  | [],      _ => []
+  | _, []      => []
 
 /- 1.1. Show that if the lists have the same length, the resulting list also
 has that length. -/
@@ -36,31 +36,36 @@ has that length. -/
 theorem List.length_add :
   ∀xs ys, List.length xs = List.length ys →
     List.length (List.add xs ys) = List.length xs
-  | [], [] =>
-    sorry
-  | x :: xs, y :: ys =>
-    sorry
-  | [], y :: ys =>
-    sorry
-  | x :: xs, [] =>
-    sorry
+  | [], [] => by sdone
+  | x :: xs, y :: ys => by
+    move=>//==Hl
+    simp [add]; srw (List.length_add _ _ Hl)
+  | [], y :: ys => by sdone
+  | x :: xs, [] => by sdone
 
 /- 1.2. Define componentwise addition on vectors using `List.add` and
 `List.length_add`. -/
 
-def Vector.add {n : ℕ} : Vector ℤ n → Vector ℤ n → Vector ℤ n :=
-  sorry
+def Vector.add {n : ℕ} : Vector ℤ n → Vector ℤ n → Vector ℤ n := by
+  move=>[l1 H1][l2 H2]
+  exact (Subtype.mk (List.add l1 l2) (by sby srw -H1; move: (List.length_add)))
 
 /- 1.3. Show that `List.add` and `Vector.add` are commutative. -/
 
 theorem List.add.comm :
-  ∀xs ys, List.add xs ys = List.add ys xs :=
-  sorry
+  ∀xs ys, List.add xs ys = List.add ys xs
+  | [], [] => by sdone
+  | [], y :: ys => by sdone
+  | x :: xs, [] => by sdone
+  | x :: xs, y :: ys => by
+    simp [add]; apply And.intro
+    {srw Int.add_comm}
+    apply List.add.comm
 
 theorem Vector.add.comm {n : ℕ} (u v : Vector ℤ n) :
-  Vector.add u v = Vector.add v u :=
-  sorry
-
+  Vector.add u v = Vector.add v u := by
+  move: u v =>[l1 H1][l2 H2]=>//==
+  sby simp [add]; srw List.add.comm
 
 /- ## Question 2: Integers as Quotients
 
