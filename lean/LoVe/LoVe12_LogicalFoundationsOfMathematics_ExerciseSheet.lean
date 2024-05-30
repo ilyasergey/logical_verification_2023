@@ -47,8 +47,8 @@ theorem List.length_add :
 `List.length_add`. -/
 
 def Vector.add {n : ℕ} : Vector ℤ n → Vector ℤ n → Vector ℤ n := by
-  move=>[l1 H1][l2 H2]
-  exact (Subtype.mk (List.add l1 l2) (by sby srw -H1; move: (List.length_add)))
+  move=>[l1 ?][l2 ?]
+  exact (Subtype.mk (List.add l1 l2) (by sby move: (List.length_add)))
 
 /- 1.3. Show that `List.add` and `Vector.add` are commutative. -/
 
@@ -96,6 +96,6 @@ theorem int.neg_neg (a : Int) :
   Int.neg (Int.neg a) = a := by
     -- WTF is happening here?
     induction a using Quotient.inductionOn with
-    | h pn => scase: pn => ??//=
+    | h pn => sby scase: pn
 
 end LoVe
